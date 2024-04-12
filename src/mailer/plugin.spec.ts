@@ -52,7 +52,6 @@ describe('EmailPlugin', () => {
                 }),
                 PluginCommonModule,
                 NotificationPlugin.init({
-                    templatePath: path.join(__dirname, '../test-templates'),
                     transport: {
                         type: 'testing',
                         onSend,
@@ -710,9 +709,7 @@ describe('EmailPlugin', () => {
 
     describe('orderConfirmationHandler', () => {
         beforeEach(async () => {
-            await initPluginWithHandlers([orderConfirmationHandler], {
-                templatePath: path.join(__dirname, '../templates'),
-            })
+            await initPluginWithHandlers([orderConfirmationHandler])
         })
 
         const ctx = RequestContext.deserialize({

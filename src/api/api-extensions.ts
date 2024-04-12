@@ -9,13 +9,13 @@ export const commonApiExtensions = gql`
 
     type EmailTemplateTranslation {
         languageCode: String!
-        title: String!
         description: String!
         body: String!
     }
 
     type EmailTemplate implements Node {
         id: ID!
+        title: String!
         createdAt: DateTime!
         updatedAt: DateTime!
         status: Status!
@@ -83,7 +83,6 @@ export const adminApiExtensions = gql`
     }
 
     input EmailTemplateTranslationInput {
-        title: String!
         description: String!
         body: String!
         languageCode: String!
@@ -92,6 +91,7 @@ export const adminApiExtensions = gql`
     input CreateEmailTemplateInput {
         status: Status!
         channels: [ID!]!
+        title: String!
         translations: [EmailTemplateTranslationInput!]!
     }
 

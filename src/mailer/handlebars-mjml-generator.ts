@@ -2,7 +2,12 @@ import dateFormat from 'dateformat'
 import Handlebars from 'handlebars'
 import mjml2html from 'mjml'
 
-import { InitializedNotificationPluginOptions } from '../../types'
+import {
+    RequestContext,
+    TransactionalConnection,
+    TranslatorService,
+} from '@vendure/core'
+import { EmailPartial } from '../entities/email-partial.entity'
 import { EmailGenerator } from './email-generator'
 
 /**
@@ -14,13 +19,21 @@ import { EmailGenerator } from './email-generator'
  * @docsPage EmailGenerator
  */
 export class HandlebarsMjmlGenerator implements EmailGenerator {
-    async onInit(options: InitializedNotificationPluginOptions) {
-        if (options.templateLoader.loadPartials) {
-            const partials = await options.templateLoader.loadPartials()
-            partials.forEach(({ name, content }) =>
-                Handlebars.registerPartial(name, content),
-            )
-        }
+    constructor(
+        private ctx: RequestContext,
+        private connection: TransactionalConnection,
+        private translator: TranslatorService,
+    ) {}
+
+    async onInit() {
+        const rawPartials = await this.connection
+            .getRepository(this.ctx, EmailPartial)
+            .find()
+
+        rawPartials.forEach((partial) => {
+            const partials = this.translator.translate(partial, this.ctx)
+            Handlebars.registerPartial(partials.title, partials.body)
+        })
         this.registerHelpers()
     }
 

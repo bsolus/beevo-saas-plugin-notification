@@ -23,12 +23,6 @@ export class EmailTemplateTranslation
     languageCode: LanguageCode
 
     /**
-     * @var String          Email template title translation
-     */
-    @Column()
-    title: string
-
-    /**
      * @var String          Email template description translation
      */
     @Column()
