@@ -8,7 +8,6 @@ import {
     TranslatorService,
 } from '@vendure/core'
 import fs from 'fs-extra'
-
 import { NOTIFICATION_PLUGIN_OPTIONS, loggerCtx } from '../../constants'
 import {
     EmailDetails,

@@ -1,12 +1,11 @@
-import dateFormat from 'dateformat'
-import Handlebars from 'handlebars'
-import mjml2html from 'mjml'
-
 import {
     RequestContext,
     TransactionalConnection,
     TranslatorService,
 } from '@vendure/core'
+import dateFormat from 'dateformat'
+import Handlebars from 'handlebars'
+import mjml2html from 'mjml'
 import { EmailPartial } from '../entities/email-partial.entity'
 import { EmailGenerator } from './email-generator'
 
