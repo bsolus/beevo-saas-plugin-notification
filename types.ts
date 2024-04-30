@@ -47,22 +47,6 @@ export type EventWithAsyncData<Event extends EventWithContext, R> = Event & {
 export interface NotificationPluginOptions {
     /**
      * @description
-     * The path to the location of the email templates. In a default Vendure installation,
-     * the templates are installed to `<project root>/vendure/email/templates`.
-     *
-     * @deprecated Use `templateLoader` to define a template path: `templateLoader: new FileBasedTemplateLoader('../your-path/templates')`
-     */
-    templatePath?: string
-    /**
-     * @description
-     * An optional TemplateLoader which can be used to load templates from a custom location or async service.
-     * The default uses the FileBasedTemplateLoader which loads templates from `<project root>/vendure/email/templates`
-     *
-     * @since 2.0.0
-     */
-    templateLoader?: TemplateLoader
-    /**
-     * @description
      * Configures how the emails are sent.
      */
     transport:
@@ -105,9 +89,7 @@ export interface NotificationPluginOptions {
 /**
  * NotificationPLuginOptions type after initialization, where templateLoader is no longer optional
  */
-export type InitializedNotificationPluginOptions = NotificationPluginOptions & {
-    templateLoader: TemplateLoader
-}
+export type InitializedNotificationPluginOptions = NotificationPluginOptions
 
 /**
  * @description
@@ -118,7 +100,7 @@ export type InitializedNotificationPluginOptions = NotificationPluginOptions & {
  */
 export interface NotificationPluginDevModeOptions
     extends Omit<NotificationPluginOptions, 'transport'> {
-    devMode: true
+    devMode: boolean
     /**
      * @description
      * The path to which html email files will be saved rather than being sent.
@@ -418,7 +400,7 @@ export interface TemplateLoader {
      * Load partials and return their contents.
      * This method is only called during initialization, i.e. during server startup.
      */
-    loadPartials?(): Promise<Partial[]>
+    loadPartials?(ctx?: RequestContext): Promise<Partial[]>
 }
 
 /**

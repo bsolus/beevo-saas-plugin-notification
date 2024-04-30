@@ -19,7 +19,8 @@ export class EmailTemplate
     /**
      * @var String  Email template title
      */
-    title: LocaleString
+    @Column()
+    title: string
 
     /**
      * @var String  Email template description

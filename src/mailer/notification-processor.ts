@@ -1,8 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import { Injector, Logger, RequestContext } from '@vendure/core'
+import {
+    Injector,
+    Logger,
+    RequestContext,
+    TransactionalConnection,
+    TranslatorService,
+} from '@vendure/core'
 import fs from 'fs-extra'
-
 import { NOTIFICATION_PLUGIN_OPTIONS, loggerCtx } from '../../constants'
 import {
     EmailDetails,
@@ -10,6 +15,7 @@ import {
     InitializedNotificationPluginOptions,
     IntermediateEmailDetails,
 } from '../../types'
+import { EmailTemplate } from '../entities/email-template.entity'
 import { deserializeAttachments } from './attachment-utils'
 import { isDevModeOptions, resolveTransportSettings } from './common'
 import { EmailGenerator } from './email-generator'
@@ -31,15 +37,18 @@ export class NotificationProcessor {
         @Inject(NOTIFICATION_PLUGIN_OPTIONS)
         protected options: InitializedNotificationPluginOptions,
         private moduleRef: ModuleRef,
+        private connection: TransactionalConnection,
+        private translator: TranslatorService,
     ) {}
 
     async init() {
+        const ctx = RequestContext.empty()
         this.sender = this.options.emailSender
             ? this.options.emailSender
             : new NodemailerEmailSender()
         this.generator = this.options.emailGenerator
             ? this.options.emailGenerator
-            : new HandlebarsMjmlGenerator()
+            : new HandlebarsMjmlGenerator(ctx, this.connection, this.translator)
         if (this.generator.onInit) {
             await this.generator.onInit.call(this.generator, this.options)
         }
@@ -55,15 +64,17 @@ export class NotificationProcessor {
     async process(data: IntermediateEmailDetails) {
         try {
             const ctx = RequestContext.deserialize(data.ctx)
-            const bodySource = await this.options.templateLoader.loadTemplate(
-                new Injector(this.moduleRef),
-                ctx,
-                {
-                    templateName: data.templateFile,
-                    type: data.type,
-                    templateVars: data.templateVars,
-                },
-            )
+            const template = await this.connection
+                .getRepository(ctx, EmailTemplate)
+                .findOneBy({
+                    title: data.templateFile,
+                })
+            if (!template) {
+                throw new Error('Could not find email template in DB')
+            }
+
+            const bodySource = this.translator.translate(template, ctx).body
+
             const generated = this.generator.generate(
                 data.from,
                 data.subject,

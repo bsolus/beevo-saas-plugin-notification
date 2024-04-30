@@ -14,6 +14,8 @@ import {
     Logger,
     PluginCommonModule,
     ProcessContext,
+    TransactionalConnection,
+    TranslatorService,
     Type,
     VendurePlugin,
     registerPluginStartupMessage,
@@ -34,7 +36,6 @@ import {
     EmailEventHandlerWithAsyncData,
 } from './src/mailer/event-handler'
 import { NotificationProcessor } from './src/mailer/notification-processor'
-import { FileBasedTemplateLoader } from './src/mailer/template-loader'
 import { EmailPartialService } from './src/services/email-partial.service'
 import { EmailTemplateService } from './src/services/email-template.service'
 import {
@@ -320,6 +321,8 @@ export class NotificationPlugin
         private emailProcessor: NotificationProcessor,
         private jobQueueService: JobQueueService,
         private processContext: ProcessContext,
+        private connection: TransactionalConnection,
+        private translator: TranslatorService,
         @Inject(NOTIFICATION_PLUGIN_OPTIONS)
         private options: InitializedNotificationPluginOptions,
     ) {}
@@ -330,22 +333,6 @@ export class NotificationPlugin
     static init(
         options: NotificationPluginOptions | NotificationPluginDevModeOptions,
     ): Type<NotificationPlugin> {
-        if (options.templateLoader) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            Logger.info(
-                `Using custom template loader '${options.templateLoader.constructor.name}'`,
-            )
-        } else if (!options.templateLoader && options.templatePath) {
-            // TODO: this else-if can be removed when deprecated templatePath is removed,
-            // because we will either have a custom template loader, or the default loader with a default path
-            options.templateLoader = new FileBasedTemplateLoader(
-                options.templatePath,
-            )
-        } else {
-            throw new Error(
-                'You must either supply a templatePath or provide a custom templateLoader',
-            )
-        }
         this.options = options as InitializedNotificationPluginOptions
         return NotificationPlugin
     }
@@ -364,6 +351,8 @@ export class NotificationPlugin
             this.testingProcessor = new NotificationProcessor(
                 this.options,
                 this.moduleRef,
+                this.connection,
+                this.translator,
             )
             await this.testingProcessor.init()
         } else {
