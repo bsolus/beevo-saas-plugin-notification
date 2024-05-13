@@ -90,14 +90,10 @@ export class HandlebarsMjmlGenerator implements EmailGenerator {
             const partials = this.translator.translate(partial, this.ctx)
             Handlebars.unregisterPartial(partials.title)
         })
-        console.log(Handlebars.partials)
-        console.log('All partials unregistered.')
 
         rawPartials.forEach((partial) => {
             const partials = this.translator.translate(partial, this.ctx)
             Handlebars.registerPartial(partials.title, partials.body)
         })
-        console.log(Handlebars.partials)
-        console.log('All partials registered.')
     }
 }

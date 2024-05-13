@@ -4,7 +4,7 @@ const config: CodegenConfig = {
     overwrite: true,
     // This assumes your server is running on the standard port
     // and with the default admin API path. Adjust accordingly.
-    schema: 'http://localhost:3000/shop-api',
+    schema: 'http://localhost:3000/admin-api',
     config: {
         // This tells codegen that the `Money` scalar is a number
         scalars: { Money: 'number' },
@@ -14,7 +14,7 @@ const config: CodegenConfig = {
     generates: {
         // The path to the generated type file in your
         // plugin directory. Adjust accordingly.
-        'src/generated/shop-types.ts': {
+        'src/generated/admin-types.ts': {
             plugins: ['typescript'],
         },
     },

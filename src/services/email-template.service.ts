@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import {
+    DeletionResponse,
+    DeletionResult,
+} from '@vendure/common/lib/generated-types'
+import {
     ChannelService,
     ID,
     ListQueryBuilder,
@@ -132,61 +136,61 @@ export class EmailTemplateService {
         })
     }
 
-    // /**
-    //  * Soft deletes an email template.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param id - The ID of the email template to be soft deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse.
-    //  */
-    // async softDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
-    //     const template = await this.connection.getEntityOrThrow(
-    //         ctx,
-    //         EmailTemplate,
-    //         id,
-    //         {},
-    //     )
-    //     //TODO: handle deletedAt
-    //     template.status = Status.DELETED
-    //     await this.connection.getRepository(ctx, EmailTemplate).save(template)
-    //     return {
-    //         result: DeletionResult.DELETED,
-    //     }
-    // }
+    /**
+     * Soft deletes an email template.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param id - The ID of the email template to be soft deleted.
+     * @returns A Promise that resolves to a DeletionResponse.
+     */
+    async softDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
+        const template = await this.connection.getEntityOrThrow(
+            ctx,
+            EmailTemplate,
+            id,
+            {},
+        )
+        //TODO: handle deletedAt
+        template.status = Status.DELETED
+        await this.connection.getRepository(ctx, EmailTemplate).save(template)
+        return {
+            result: DeletionResult.DELETED,
+        }
+    }
 
-    // /**
-    //  * Hard deletes an email template.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param id - The ID of the email template to be hard deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse.
-    //  */
-    // async hardDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
-    //     const template = await this.connection.getEntityOrThrow(
-    //         ctx,
-    //         EmailTemplate,
-    //         id,
-    //         {},
-    //     )
-    //     if (template.status === Status.DELETED) {
-    //         await this.connection
-    //             .getRepository(ctx, EmailTemplate)
-    //             .delete(template.id)
-    //         await this.channelService.removeFromChannels(
-    //             ctx,
-    //             EmailTemplate,
-    //             id,
-    //             [ctx.channelId],
-    //         )
+    /**
+     * Hard deletes an email template.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param id - The ID of the email template to be hard deleted.
+     * @returns A Promise that resolves to a DeletionResponse.
+     */
+    async hardDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
+        const template = await this.connection.getEntityOrThrow(
+            ctx,
+            EmailTemplate,
+            id,
+            {},
+        )
+        if (template.status === Status.DELETED) {
+            await this.connection
+                .getRepository(ctx, EmailTemplate)
+                .delete(template.id)
+            await this.channelService.removeFromChannels(
+                ctx,
+                EmailTemplate,
+                id,
+                [ctx.channelId],
+            )
 
-    //         return {
-    //             result: DeletionResult.DELETED,
-    //         }
-    //     }
-    //     return {
-    //         result: DeletionResult.NOT_DELETED,
-    //     }
-    // }
+            return {
+                result: DeletionResult.DELETED,
+            }
+        }
+        return {
+            result: DeletionResult.NOT_DELETED,
+        }
+    }
 
     /**
      * Publishes an email template.

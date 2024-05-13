@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import {
+    DeletionResponse,
+    DeletionResult,
+} from '@vendure/common/lib/generated-types'
+import {
     ID,
     ListQueryBuilder,
     ListQueryOptions,
@@ -147,49 +151,49 @@ export class EmailPartialService {
             .save(updatedPartial)
     }
 
-    // /**
-    //  * Performs a soft delete on an email partial within a transaction.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param id - The ID of the email partial to be soft deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse.
-    //  */
-    // async softDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
-    //     const partial = await this.connection.getEntityOrThrow(
-    //         ctx,
-    //         EmailPartial,
-    //         id,
-    //         {},
-    //     )
+    /**
+     * Performs a soft delete on an email partial within a transaction.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param id - The ID of the email partial to be soft deleted.
+     * @returns A Promise that resolves to a DeletionResponse.
+     */
+    async softDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
+        const partial = await this.connection.getEntityOrThrow(
+            ctx,
+            EmailPartial,
+            id,
+            {},
+        )
 
-    //     partial.status = Status.DELETED
-    //     await this.connection.getRepository(ctx, EmailPartial).save(partial)
-    //     return {
-    //         result: DeletionResult.DELETED,
-    //     }
-    // }
+        partial.status = Status.DELETED
+        await this.connection.getRepository(ctx, EmailPartial).save(partial)
+        return {
+            result: DeletionResult.DELETED,
+        }
+    }
 
-    // /**
-    //  * Performs a hard delete on an email partial within a transaction.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param id - The ID of the email partial to be hard-deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
-    //  */
-    // async hardDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
-    //     const partial = await this.connection.getEntityOrThrow(
-    //         ctx,
-    //         EmailPartial,
-    //         id,
-    //         {},
-    //     )
-    //     await this.connection
-    //         .getRepository(ctx, EmailPartial)
-    //         .delete(partial.id)
-    //     return {
-    //         result: DeletionResult.DELETED,
-    //     }
-    // }
+    /**
+     * Performs a hard delete on an email partial within a transaction.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param id - The ID of the email partial to be hard-deleted.
+     * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
+     */
+    async hardDelete(ctx: RequestContext, id: ID): Promise<DeletionResponse> {
+        const partial = await this.connection.getEntityOrThrow(
+            ctx,
+            EmailPartial,
+            id,
+            {},
+        )
+        await this.connection
+            .getRepository(ctx, EmailPartial)
+            .delete(partial.id)
+        return {
+            result: DeletionResult.DELETED,
+        }
+    }
 
     /**
      * Publishes an email partial.

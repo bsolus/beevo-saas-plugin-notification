@@ -81,7 +81,7 @@ export class NotificationProcessor {
                 bodySource,
                 data.templateVars,
             )
-            console.log(generated)
+
             const emailDetails: EmailDetails = {
                 ...generated,
                 recipient: data.recipient,
