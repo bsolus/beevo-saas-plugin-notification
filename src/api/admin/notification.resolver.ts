@@ -8,6 +8,7 @@ import {
     Transaction,
 } from '@vendure/core'
 
+import { DeletionResponse } from '@vendure/common/lib/generated-types'
 import { EmailPartial } from '../../entities/email-partial.entity'
 import { EmailTemplate } from '../../entities/email-template.entity'
 import { EmailPartialService } from '../../services/email-partial.service'
@@ -73,37 +74,37 @@ export class AdminNotificationResolver {
         return this.emailTemplateService.findAll(ctx, args.options || undefined)
     }
 
-    // /**
-    //  * Performs a soft delete on an email template within a transaction.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param args - The arguments containing the ID of the email template to be soft-deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse indicating the result of the soft delete operation.
-    //  */
-    // @Mutation()
-    // @Transaction()
-    // softDeleteEmailTemplate(
-    //     @Ctx() ctx: RequestContext,
-    //     @Args() args: { id: string },
-    // ): Promise<DeletionResponse> {
-    //     return this.emailTemplateService.softDelete(ctx, args.id)
-    // }
+    /**
+     * Performs a soft delete on an email template within a transaction.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param args - The arguments containing the ID of the email template to be soft-deleted.
+     * @returns A Promise that resolves to a DeletionResponse indicating the result of the soft delete operation.
+     */
+    @Mutation()
+    @Transaction()
+    softDeleteEmailTemplate(
+        @Ctx() ctx: RequestContext,
+        @Args() args: { id: string },
+    ): Promise<DeletionResponse> {
+        return this.emailTemplateService.softDelete(ctx, args.id)
+    }
 
-    // /**
-    //  * Performs a hard delete on an email template within a transaction.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param args - The arguments containing the ID of the email template to be hard-deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
-    //  */
-    // @Mutation()
-    // @Transaction()
-    // hardDeleteEmailTemplate(
-    //     @Ctx() ctx: RequestContext,
-    //     @Args() args: { id: string },
-    // ): Promise<DeletionResponse> {
-    //     return this.emailTemplateService.hardDelete(ctx, args.id)
-    // }
+    /**
+     * Performs a hard delete on an email template within a transaction.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param args - The arguments containing the ID of the email template to be hard-deleted.
+     * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
+     */
+    @Mutation()
+    @Transaction()
+    hardDeleteEmailTemplate(
+        @Ctx() ctx: RequestContext,
+        @Args() args: { id: string },
+    ): Promise<DeletionResponse> {
+        return this.emailTemplateService.hardDelete(ctx, args.id)
+    }
 
     /**
      * Publishes an email template within a transaction.
@@ -191,19 +192,19 @@ export class AdminNotificationResolver {
         )
     }
 
-    // /**
-    //  * Performs a hard delete on an email partial within a transaction.
-    //  *
-    //  * @param ctx - The RequestContext containing information about the request.
-    //  * @param args - The arguments containing the ID of the email partial to be hard-deleted.
-    //  * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
-    //  */
-    // @Mutation()
-    // @Transaction()
-    // hardDeleteEmailPartial(
-    //     @Ctx() ctx: RequestContext,
-    //     @Args() args: { id: string },
-    // ): Promise<DeletionResponse> {
-    //     return this.emailPartialService.hardDelete(ctx, args.id)
-    // }
+    /**
+     * Performs a hard delete on an email partial within a transaction.
+     *
+     * @param ctx - The RequestContext containing information about the request.
+     * @param args - The arguments containing the ID of the email partial to be hard-deleted.
+     * @returns A Promise that resolves to a DeletionResponse indicating the result of the hard delete operation.
+     */
+    @Mutation()
+    @Transaction()
+    hardDeleteEmailPartial(
+        @Ctx() ctx: RequestContext,
+        @Args() args: { id: string },
+    ): Promise<DeletionResponse> {
+        return this.emailPartialService.hardDelete(ctx, args.id)
+    }
 }
