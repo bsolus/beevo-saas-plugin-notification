@@ -1,4 +1,4 @@
-name: CMS Plugin
+name: Notification Plugin
 
 on:
     pull_request:

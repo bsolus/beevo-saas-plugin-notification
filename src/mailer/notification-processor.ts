@@ -24,15 +24,21 @@ import { HandlebarsMjmlGenerator } from './handlebars-mjml-generator'
 import { NodemailerEmailSender } from './nodemailer-email-sender'
 
 /**
- * This class combines the template loading, generation, and email sending - the actual "work" of
- * the NotificationPlugin. It is arranged this way primarily to accommodate easier testing, so that the
- * tests can be run without needing all the JobQueue stuff which would require a full e2e test.
+ * Combines template loading, generation, and email sending for the NotificationPlugin.
+ * This class facilitates easier testing by separating the core logic from infrastructure dependencies.
  */
 @Injectable()
 export class NotificationProcessor {
     protected sender: EmailSender
     protected generator: EmailGenerator
 
+    /**
+     * Initializes the NotificationProcessor.
+     * @param options - Plugin options.
+     * @param moduleRef - Reference to the current module.
+     * @param connection - Transactional database connection.
+     * @param translator - Service for translating messages.
+     */
     constructor(
         @Inject(NOTIFICATION_PLUGIN_OPTIONS)
         protected options: InitializedNotificationPluginOptions,
@@ -41,6 +47,9 @@ export class NotificationProcessor {
         private translator: TranslatorService,
     ) {}
 
+    /**
+     * Initializes the processor by setting up the email sender and generator.
+     */
     async init() {
         const ctx = RequestContext.empty()
         this.sender = this.options.emailSender
@@ -49,19 +58,24 @@ export class NotificationProcessor {
         this.generator = this.options.emailGenerator
             ? this.options.emailGenerator
             : new HandlebarsMjmlGenerator(ctx, this.connection, this.translator)
+
         if (this.generator.onInit) {
             await this.generator.onInit.call(this.generator, this.options)
         }
+
         const transport = await this.getTransportSettings()
         if (transport.type === 'file') {
-            // ensure the configured directory exists before
-            // we attempt to write files to it
             const emailPath = transport.outputPath
             await fs.ensureDir(emailPath)
         }
     }
 
-    async process(data: IntermediateEmailDetails) {
+    /**
+     * Processes an email based on the provided details.
+     * @param data - Intermediate email details.
+     * @returns A promise that resolves to `true` if the email was sent successfully.
+     */
+    async process(data: IntermediateEmailDetails): Promise<boolean> {
         try {
             const ctx = RequestContext.deserialize(data.ctx)
             const template = await this.connection
@@ -69,12 +83,12 @@ export class NotificationProcessor {
                 .findOneBy({
                     title: data.type,
                 })
+
             if (!template) {
                 throw new Error('Could not find email template in DB')
             }
 
             const bodySource = this.translator.translate(template, ctx).body
-
             const generated = await this.generator.generate(
                 data.from,
                 data.subject,
@@ -90,6 +104,7 @@ export class NotificationProcessor {
                 bcc: data.bcc,
                 replyTo: data.replyTo,
             }
+
             const transportSettings = await this.getTransportSettings(ctx)
             await this.sender.send(emailDetails, transportSettings)
             return true
@@ -103,6 +118,11 @@ export class NotificationProcessor {
         }
     }
 
+    /**
+     * Retrieves the email transport settings based on the plugin configuration.
+     * @param ctx - Optional request context.
+     * @returns A promise that resolves to the email transport options.
+     */
     async getTransportSettings(
         ctx?: RequestContext,
     ): Promise<EmailTransportOptions> {
@@ -111,6 +131,7 @@ export class NotificationProcessor {
             new Injector(this.moduleRef),
             ctx,
         )
+
         if (isDevModeOptions(this.options)) {
             if (transport && transport.type !== 'file') {
                 Logger.warn(
