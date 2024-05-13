@@ -28,7 +28,7 @@ import { EmailPartialTranslation } from './src/entities/email-partial-translatio
 import { EmailPartial } from './src/entities/email-partial.entity'
 import { EmailTemplateTranslation } from './src/entities/email-template-translation.entity'
 import { EmailTemplate } from './src/entities/email-template.entity'
-import { TimestampEntity } from './src/entities/timestamp.entity'
+import { NotificationEntity } from './src/entities/notification.entity'
 import { isDevModeOptions, resolveTransportSettings } from './src/mailer/common'
 import { DevMailbox } from './src/mailer/dev-mailbox'
 import {
@@ -289,7 +289,7 @@ import {
         EmailPartialTranslation,
         EmailTemplate,
         EmailTemplateTranslation,
-        TimestampEntity,
+        NotificationEntity,
     ],
     adminApiExtensions: {
         resolvers: [AdminNotificationResolver],
@@ -392,6 +392,9 @@ export class NotificationPlugin
         if (typeof this.options.emailSender?.init === 'function') {
             await this.options.emailSender.init(injector)
         }
+        if (typeof this.options.customTemplateVars?.init === 'function') {
+            await this.options.customTemplateVars.init(injector)
+        }
     }
 
     private async destroyInjectableStrategies() {
@@ -417,11 +420,22 @@ export class NotificationPlugin
     ) {
         Logger.debug(`Handling event "${handler.type}"`, loggerCtx)
         const { type } = handler
+
         try {
+            let customVariables = {}
+            if (this.options.customTemplateVars) {
+                customVariables =
+                    await this.options.customTemplateVars.fetchTemplateVariables(
+                        event.ctx,
+                    )
+            }
             const injector = new Injector(this.moduleRef)
             const result = await handler.handle(
                 event as any,
-                NotificationPlugin.options.globalTemplateVars,
+                {
+                    ...NotificationPlugin.options.globalTemplateVars,
+                    ...customVariables,
+                },
                 injector,
             )
             if (!result) {

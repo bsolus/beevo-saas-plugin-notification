@@ -30,5 +30,5 @@ export interface EmailGenerator<
         subject: string,
         body: string,
         templateVars: { [key: string]: any },
-    ): Pick<EmailDetails, 'from' | 'subject' | 'body'>
+    ): Promise<Pick<EmailDetails, 'from' | 'subject' | 'body'>>
 }

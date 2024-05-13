@@ -12,8 +12,9 @@
         "sourceMap": false,
         "skipLibCheck": true,
         "strictPropertyInitialization": false,
-        "types": ["node"]
+        "types": ["node"],
+        "baseUrl": "./"
     },
-    "include": ["src/"],
+    "include": ["src/", "test/"],
     "exclude": ["src/ui"]
 }

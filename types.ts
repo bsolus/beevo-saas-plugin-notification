@@ -68,6 +68,13 @@ export interface NotificationPluginOptions {
      * email.
      */
     globalTemplateVars?: { [key: string]: any }
+
+    /**
+     * @description
+     * An object containing custom variables which are made available to all templates.
+     */
+    customTemplateVars?: { [key: string]: any }
+
     /**
      * @description
      * An optional allowed EmailSender, used to allow custom implementations of the send functionality

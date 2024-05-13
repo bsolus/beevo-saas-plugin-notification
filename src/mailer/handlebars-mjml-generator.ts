@@ -25,23 +25,17 @@ export class HandlebarsMjmlGenerator implements EmailGenerator {
     ) {}
 
     async onInit() {
-        const rawPartials = await this.connection
-            .getRepository(this.ctx, EmailPartial)
-            .find()
-
-        rawPartials.forEach((partial) => {
-            const partials = this.translator.translate(partial, this.ctx)
-            Handlebars.registerPartial(partials.title, partials.body)
-        })
+        await this.registerPartials()
         this.registerHelpers()
     }
 
-    generate(
+    async generate(
         from: string,
         subject: string,
         template: string,
         templateVars: any,
     ) {
+        await this.registerPartials()
         const compiledFrom = Handlebars.compile(from, { noEscape: true })
         const compiledSubject = Handlebars.compile(subject)
         const compiledTemplate = Handlebars.compile(template)
@@ -85,5 +79,25 @@ export class HandlebarsMjmlGenerator implements EmailGenerator {
             }
             return (amount / 100).toFixed(2)
         })
+    }
+
+    async registerPartials() {
+        const rawPartials = await this.connection
+            .getRepository(this.ctx, EmailPartial)
+            .find()
+
+        rawPartials.forEach((partial) => {
+            const partials = this.translator.translate(partial, this.ctx)
+            Handlebars.unregisterPartial(partials.title)
+        })
+        console.log(Handlebars.partials)
+        console.log('All partials unregistered.')
+
+        rawPartials.forEach((partial) => {
+            const partials = this.translator.translate(partial, this.ctx)
+            Handlebars.registerPartial(partials.title, partials.body)
+        })
+        console.log(Handlebars.partials)
+        console.log('All partials registered.')
     }
 }

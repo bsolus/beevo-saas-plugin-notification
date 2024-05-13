@@ -9,11 +9,11 @@ import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
 import { Status } from '../enums/status.enum'
 import { EmailPartial } from './email-partial.entity'
 import { EmailTemplateTranslation } from './email-template-translation.entity'
-import { TimestampEntity } from './timestamp.entity'
+import { NotificationEntity } from './notification.entity'
 
 @Entity()
 export class EmailTemplate
-    extends TimestampEntity
+    extends NotificationEntity
     implements ChannelAware, Translatable
 {
     /**

@@ -4,10 +4,10 @@ import { EmailPartialType } from '../enums/email-partial.enum'
 import { Status } from '../enums/status.enum'
 import { EmailPartialTranslation } from './email-partial-translation.entity'
 import { EmailTemplate } from './email-template.entity'
-import { TimestampEntity } from './timestamp.entity'
+import { NotificationEntity } from './notification.entity'
 
 @Entity()
-export class EmailPartial extends TimestampEntity implements Translatable {
+export class EmailPartial extends NotificationEntity implements Translatable {
     /**
      * @var String              Email partial title
      */

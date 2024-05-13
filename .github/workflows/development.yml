@@ -1,0 +1,61 @@
+name: CMS Plugin
+
+on:
+    pull_request:
+        branches: ['staging', 'main']
+
+env:
+    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+jobs:
+    build-and-lint:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [20.x] # Update given your Node versions for your service
+
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Install Dependencies
+              run: yarn install
+
+    e2e-tests:
+        runs-on: ubuntu-latest
+        needs: build-and-lint
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Use Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.x
+
+            - name: Install Dependencies
+              run: yarn install
+
+            - name: Run E2E Tests
+              run: yarn run test:e2e
+
+    test-coverage:
+        runs-on: ubuntu-latest
+        needs: build-and-lint
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: Use Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 20.x
+
+            - name: Install Dependencies
+              run: yarn install
+
+            - name: Generate Test Coverage
+              run: yarn run test:cov

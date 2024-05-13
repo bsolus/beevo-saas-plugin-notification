@@ -8,11 +8,11 @@ import {
 import { Column, Entity, ManyToOne } from 'typeorm'
 
 /**
- * Entity for timestamps
+ * Entity for notification plugin
  */
 @Entity()
-export class TimestampEntity extends VendureEntity implements SoftDeletable {
-    constructor(input?: DeepPartial<TimestampEntity>) {
+export class NotificationEntity extends VendureEntity implements SoftDeletable {
+    constructor(input?: DeepPartial<NotificationEntity>) {
         super(input)
     }
 

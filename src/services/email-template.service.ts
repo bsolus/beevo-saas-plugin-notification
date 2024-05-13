@@ -97,7 +97,6 @@ export class EmailTemplateService {
         input: CreateEmailTemplateInput,
     ): Promise<EmailTemplate> {
         input['createdBy'] = ctx.activeUserId
-        console.log(input)
         return await this.translatableSaver.create({
             ctx,
             input,

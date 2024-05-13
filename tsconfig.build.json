@@ -1,7 +1,7 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "outDir": "./lib"
+        "outDir": "./dist"
     },
-    "files": ["./index.ts"]
+    "include": ["./notification.plugin.ts", "./src/mailer/*"]
 }

@@ -67,7 +67,7 @@ export class NotificationProcessor {
             const template = await this.connection
                 .getRepository(ctx, EmailTemplate)
                 .findOneBy({
-                    title: data.templateFile,
+                    title: data.type,
                 })
             if (!template) {
                 throw new Error('Could not find email template in DB')
@@ -75,12 +75,13 @@ export class NotificationProcessor {
 
             const bodySource = this.translator.translate(template, ctx).body
 
-            const generated = this.generator.generate(
+            const generated = await this.generator.generate(
                 data.from,
                 data.subject,
                 bodySource,
                 data.templateVars,
             )
+            console.log(generated)
             const emailDetails: EmailDetails = {
                 ...generated,
                 recipient: data.recipient,
