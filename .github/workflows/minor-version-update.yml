@@ -1,0 +1,32 @@
+name: Minor version update
+
+on: workflow_dispatch
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [20.x]
+
+        env:
+            AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Minor version update
+              run: |
+                  git config user.name "$(git log -n 1 --pretty=format:%an)"
+                  git config user.email "$(git log -n 1 --pretty=format:%ae)"
+                  git pull
+                  yarn install
+                  yarn version --minor --no-git-tag-version
+                  git add package.json
+                  git add yarn.lock
+                  git commit -m "[skip CI]"
+                  git push
