@@ -8,7 +8,7 @@ import { EventWithContext, NotificationPluginDevModeOptions } from '../../types'
 import { EmailEventHandler } from './event-handler'
 
 /**
- * An email inbox application that serves the contents of the dev mode `outputPath` directory.
+ * Represents a development mode mailbox application for handling email notifications.
  */
 export class DevMailbox {
     private handleMockEventFn: (
@@ -16,20 +16,33 @@ export class DevMailbox {
         event: EventWithContext,
     ) => void | undefined
 
+    /**
+     * Serves routes for the DevMailbox application based on provided options.
+     * @param options The options object for configuring the mailbox.
+     * @returns An Express router with configured routes.
+     */
     serve(options: NotificationPluginDevModeOptions): Router {
         const { outputPath, handlers } = options
         const server = Router()
+
+        // Route to serve the main mailbox interface
         server.get('/', (req, res) => {
             res.sendFile(path.join(__dirname, '../../dev-mailbox.html'))
         })
+
+        // Route to list email contents
         server.get('/list', async (req, res) => {
             const list = await fs.readdir(outputPath)
             const contents = await this.getEmailList(outputPath)
             res.send(contents)
         })
+
+        // Route to retrieve available email types
         server.get('/types', async (req, res) => {
             res.send(handlers.map((h) => h.type))
         })
+
+        // Route to generate a mock email
         server.get('/generate/:type/:languageCode', async (req, res) => {
             const { type, languageCode } = req.params
             if (this.handleMockEventFn) {
@@ -63,11 +76,15 @@ export class DevMailbox {
                 })
             }
         })
+
+        // Route to retrieve a specific email item
         server.get('/item/:id', async (req, res) => {
             const fileName = req.params.id
             const content = await this.getEmail(outputPath, fileName)
             res.send(content)
         })
+
+        // Route to serve a placeholder image
         server.get('/placeholder-image', async (req, res) => {
             const img = Buffer.from(
                 // eslint-disable-next-line max-len
@@ -85,6 +102,10 @@ export class DevMailbox {
         return server
     }
 
+    /**
+     * Sets up a handler function for mocking email events.
+     * @param handler The event handler function.
+     */
     handleMockEvent(
         handler: (
             handler: EmailEventHandler<string, any>,
@@ -94,6 +115,11 @@ export class DevMailbox {
         this.handleMockEventFn = handler
     }
 
+    /**
+     * Retrieves the list of email contents from the specified output directory.
+     * @param outputPath The path to the directory containing email JSON files.
+     * @returns A Promise resolving to an array of objects representing email metadata.
+     */
     private async getEmailList(outputPath: string) {
         const list = await fs.readdir(outputPath)
         const contents: Array<{
@@ -121,6 +147,12 @@ export class DevMailbox {
         return contents
     }
 
+    /**
+     * Retrieves the content of a specific email file.
+     * @param outputPath The path to the directory containing email files.
+     * @param fileName The name of the email file to retrieve.
+     * @returns A Promise resolving to the content of the specified email file.
+     */
     private async getEmail(outputPath: string, fileName: string) {
         const safeSuffix = path
             .normalize(fileName)
@@ -131,6 +163,12 @@ export class DevMailbox {
         return content
     }
 
+    /**
+     * Creates a RequestContext object based on the provided parameters.
+     * @param languageCode The language code for the request context.
+     * @param req The Express request object associated with the request context.
+     * @returns A new RequestContext instance initialized with the given parameters.
+     */
     private createRequestContext(
         languageCode: LanguageCode,
         req: Request,
