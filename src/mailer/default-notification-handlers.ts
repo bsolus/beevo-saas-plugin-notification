@@ -44,7 +44,7 @@ export const orderConfirmationHandler = new EmailEventListener(
     })
     .setRecipient((event) => event.order.customer!.emailAddress)
     .setFrom('{{ fromAddress }}')
-    .setSubject('Order confirmation for #{{ order.code }}')
+    .setSubject('Confirmação de encomenda: #{{ order.code }}')
     .setTemplateVars((event) => ({
         order: event.order,
         shippingLines: event.data.shippingLines,
@@ -64,7 +64,7 @@ export const emailVerificationHandler = new EmailEventListener(
     })
     .setRecipient((event) => event.user.identifier)
     .setFrom('{{ fromAddress }}')
-    .setSubject('Please verify your email address')
+    .setSubject('Confirme o seu e-mail')
     .setTemplateVars((event) => ({
         verificationToken:
             event.user.getNativeAuthenticationMethod().verificationToken,
@@ -75,7 +75,7 @@ export const passwordResetHandler = new EmailEventListener('password-reset')
     .on(PasswordResetEvent)
     .setRecipient((event) => event.user.identifier)
     .setFrom('{{ fromAddress }}')
-    .setSubject('Forgotten password reset')
+    .setSubject('Reposição de palavra-passe')
     .setTemplateVars((event) => ({
         passwordResetToken:
             event.user.getNativeAuthenticationMethod().passwordResetToken,
@@ -91,7 +91,7 @@ export const emailAddressChangeHandler = new EmailEventListener(
             event.user.getNativeAuthenticationMethod().pendingIdentifier!,
     )
     .setFrom('{{ fromAddress }}')
-    .setSubject('Please verify your change of email address')
+    .setSubject('Alteração de e-mail na conta')
     .setTemplateVars((event) => ({
         identifierChangeToken:
             event.user.getNativeAuthenticationMethod().identifierChangeToken,
