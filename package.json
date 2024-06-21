@@ -1,6 +1,6 @@
 {
     "name": "@bsolus/beevo-saas-plugin-notification",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "license": "MIT",
     "main": "dist/notification.plugin.js",
     "types": "dist/notification.plugin.d.ts",
