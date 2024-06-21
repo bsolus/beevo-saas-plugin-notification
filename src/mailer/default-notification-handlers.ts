@@ -51,6 +51,110 @@ export const orderConfirmationHandler = new EmailEventListener(
     }))
     .setMockEvent(mockOrderStateTransitionEvent)
 
+export const orderPartiallyShippedHandler = new EmailEventListener(
+    'order-partially-shipped',
+)
+    .on(OrderStateTransitionEvent)
+    .filter(
+        (event) =>
+            event.toState === 'PartiallyShipped'
+    )
+    .loadData(async ({ event, injector }) => {
+        transformOrderLineAssetUrls(event.ctx, event.order, injector)
+        const shippingLines = await hydrateShippingLines(
+            event.ctx,
+            event.order,
+            injector,
+        )
+        return { shippingLines }
+    })
+    .setRecipient((event) => event.order.customer!.emailAddress)
+    .setFrom('{{ fromAddress }}')
+    .setSubject('Produtos enviados da sua encomenda #{{ order.code }}')
+    .setTemplateVars((event) => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }))
+    .setMockEvent(mockOrderStateTransitionEvent)
+
+export const orderShippedHandler = new EmailEventListener(
+    'order-shipped',
+)
+    .on(OrderStateTransitionEvent)
+    .filter(
+        (event) =>
+            event.toState === 'Shipped'
+    )
+    .loadData(async ({ event, injector }) => {
+        transformOrderLineAssetUrls(event.ctx, event.order, injector)
+        const shippingLines = await hydrateShippingLines(
+            event.ctx,
+            event.order,
+            injector,
+        )
+        return { shippingLines }
+    })
+    .setRecipient((event) => event.order.customer!.emailAddress)
+    .setFrom('{{ fromAddress }}')
+    .setSubject('A sua encomenda #{{ order.code }} foi enviada')
+    .setTemplateVars((event) => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }))
+    .setMockEvent(mockOrderStateTransitionEvent)
+
+export const orderPartiallyDeliveredHandler = new EmailEventListener(
+    'order-partially-delivered',
+)
+    .on(OrderStateTransitionEvent)
+    .filter(
+        (event) =>
+            event.toState === 'PartiallyDelivered'
+    )
+    .loadData(async ({ event, injector }) => {
+        transformOrderLineAssetUrls(event.ctx, event.order, injector)
+        const shippingLines = await hydrateShippingLines(
+            event.ctx,
+            event.order,
+            injector,
+        )
+        return { shippingLines }
+    })
+    .setRecipient((event) => event.order.customer!.emailAddress)
+    .setFrom('{{ fromAddress }}')
+    .setSubject('Produtos entregues da sua encomenda #{{ order.code }}')
+    .setTemplateVars((event) => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }))
+    .setMockEvent(mockOrderStateTransitionEvent)
+
+export const orderDeliveredHandler = new EmailEventListener(
+    'order-delivered',
+)
+    .on(OrderStateTransitionEvent)
+    .filter(
+        (event) =>
+            event.toState === 'Delivered'
+    )
+    .loadData(async ({ event, injector }) => {
+        transformOrderLineAssetUrls(event.ctx, event.order, injector)
+        const shippingLines = await hydrateShippingLines(
+            event.ctx,
+            event.order,
+            injector,
+        )
+        return { shippingLines }
+    })
+    .setRecipient((event) => event.order.customer!.emailAddress)
+    .setFrom('{{ fromAddress }}')
+    .setSubject('A sua encomenda #{{ order.code }} foi entregue')
+    .setTemplateVars((event) => ({
+        order: event.order,
+        shippingLines: event.data.shippingLines,
+    }))
+    .setMockEvent(mockOrderStateTransitionEvent)
+
 export const emailVerificationHandler = new EmailEventListener(
     'email-verification',
 )
@@ -103,6 +207,10 @@ export const defaultNotificationHandlers: Array<EmailEventHandler<any, any>> = [
     emailVerificationHandler,
     passwordResetHandler,
     emailAddressChangeHandler,
+    orderPartiallyShippedHandler,
+    orderShippedHandler,
+    orderPartiallyDeliveredHandler,
+    orderDeliveredHandler,
 ]
 
 /**
